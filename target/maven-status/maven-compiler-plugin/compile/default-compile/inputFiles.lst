@@ -1,0 +1,11 @@
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/SharePointConnector.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/client/SharePointClient.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/parser/ExcelFileParser.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/auth/SharePointAuthenticator.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/SharePointDataSourceReader.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/util/SharePointFile.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/parser/FileParser.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/SharePointDataSourceFactory.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/parser/CsvFileParser.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/parser/FileParserFactory.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/main/java/com/aws/glue/connector/sharepoint/SharePointInputPartition.java

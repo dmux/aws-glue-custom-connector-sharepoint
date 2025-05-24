@@ -1,0 +1,17 @@
+com/aws/glue/connector/sharepoint/SharePointDataSourceReader.class
+com/aws/glue/connector/sharepoint/parser/ExcelFileParser.class
+com/aws/glue/connector/sharepoint/client/SharePointClient.class
+com/aws/glue/connector/sharepoint/SharePointDataSourceReader$SharePointScanBuilder.class
+com/aws/glue/connector/sharepoint/SharePointDataSourceReader$SharePointBatch.class
+com/aws/glue/connector/sharepoint/SharePointInputPartition$SharePointInputPartitionReader.class
+com/aws/glue/connector/sharepoint/SharePointDataSourceReader$SharePointPartitionReaderFactory.class
+com/aws/glue/connector/sharepoint/parser/FileParserFactory.class
+com/aws/glue/connector/sharepoint/auth/SharePointAuthenticator.class
+com/aws/glue/connector/sharepoint/SharePointConnector.class
+com/aws/glue/connector/sharepoint/SharePointDataSourceReader$SharePointScan.class
+com/aws/glue/connector/sharepoint/parser/CsvFileParser.class
+com/aws/glue/connector/sharepoint/SharePointInputPartition.class
+com/aws/glue/connector/sharepoint/parser/ExcelFileParser$1.class
+com/aws/glue/connector/sharepoint/SharePointDataSourceFactory.class
+com/aws/glue/connector/sharepoint/parser/FileParser.class
+com/aws/glue/connector/sharepoint/util/SharePointFile.class
