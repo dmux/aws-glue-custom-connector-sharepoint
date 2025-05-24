@@ -24,12 +24,26 @@ job.init(args['JOB_NAME'], args)
 
 # Configurações do SharePoint
 # IMPORTANTE: Em produção, use AWS Secrets Manager ou Parameters Store
-sharepoint_options = {
+
+# MODO 1: Discovery Automático (processa todos os arquivos CSV/Excel)
+sharepoint_options_auto = {
     "sharepoint.clientId": "your-azure-app-client-id",
     "sharepoint.clientSecret": "your-azure-app-client-secret", 
     "sharepoint.tenantId": "your-azure-tenant-id",
     "sharepoint.siteId": "your-sharepoint-site-id"
 }
+
+# MODO 2: Arquivo Específico (processa apenas o arquivo indicado)
+sharepoint_options_specific = {
+    "sharepoint.clientId": "your-azure-app-client-id",
+    "sharepoint.clientSecret": "your-azure-app-client-secret", 
+    "sharepoint.tenantId": "your-azure-tenant-id",
+    "sharepoint.siteId": "your-sharepoint-site-id",
+    "sharepoint.filePath": "Reports/Monthly/sales-data.xlsx"  # Caminho específico
+}
+
+# Escolher o modo desejado
+sharepoint_options = sharepoint_options_auto  # ou sharepoint_options_specific
 
 print("🔗 Conectando ao SharePoint...")
 

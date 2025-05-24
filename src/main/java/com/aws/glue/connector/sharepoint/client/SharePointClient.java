@@ -151,6 +151,77 @@ public class SharePointClient {
     }
     
     /**
+     * Get file by specific path in the SharePoint document library
+     * 
+     * @param filePath Path to the file relative to the document library root (e.g., "folder/subfolder/file.csv")
+     * @return SharePointFile object if found, null otherwise
+     */
+    public SharePointFile getFileByPath(String filePath) {
+        try {
+            logger.info("Getting file by path: {} from SharePoint site: {}", filePath, siteId);
+            
+            // Clean the path - remove leading slash if present
+            String cleanPath = filePath.startsWith("/") ? filePath.substring(1) : filePath;
+            
+            // Use the Graph API to get the file by path
+            DriveItem item = graphClient
+                    .sites(siteId)
+                    .drive()
+                    .root()
+                    .itemWithPath(cleanPath)
+                    .buildRequest()
+                    .get();
+            
+            if (item != null && item.file != null) {
+                // Check if file type is supported
+                if (!isSupportedFile(item.name)) {
+                    throw new RuntimeException("Unsupported file type: " + item.name + 
+                                             ". Supported types: " + SUPPORTED_EXTENSIONS);
+                }
+                
+                SharePointFile spFile = new SharePointFile(
+                        item.id,
+                        item.name,
+                        item.size,
+                        item.lastModifiedDateTime
+                );
+                
+                logger.info("Found file by path: {} ({})", item.name, formatFileSize(item.size));
+                return spFile;
+            } else {
+                logger.warn("File not found at path: {}", filePath);
+                return null;
+            }
+            
+        } catch (RuntimeException e) {
+            // Re-throw validation exceptions (like unsupported file type) as-is
+            if (e.getMessage() != null && e.getMessage().contains("Unsupported file type")) {
+                throw e;
+            }
+            logger.error("Failed to get file by path: {}", filePath, e);
+            throw new RuntimeException("Failed to get SharePoint file at path: " + filePath, e);
+        } catch (Exception e) {
+            logger.error("Failed to get file by path: {}", filePath, e);
+            throw new RuntimeException("Failed to get SharePoint file at path: " + filePath, e);
+        }
+    }
+    
+    /**
+     * Get single file as list (for compatibility with existing listFiles usage)
+     * 
+     * @param filePath Path to the specific file
+     * @return List containing the single file, or empty list if not found
+     */
+    public List<SharePointFile> getFileByPathAsList(String filePath) {
+        List<SharePointFile> files = new ArrayList<>();
+        SharePointFile file = getFileByPath(filePath);
+        if (file != null) {
+            files.add(file);
+        }
+        return files;
+    }
+
+    /**
      * Check if file extension is supported
      */
     private boolean isSupportedFile(String fileName) {

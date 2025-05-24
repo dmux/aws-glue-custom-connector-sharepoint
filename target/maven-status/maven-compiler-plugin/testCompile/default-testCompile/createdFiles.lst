@@ -3,6 +3,7 @@ com/aws/glue/connector/sharepoint/util/SharePointFileTest.class
 com/aws/glue/connector/sharepoint/auth/SharePointAuthenticatorTest.class
 com/aws/glue/connector/sharepoint/SharePointDataSourceFactoryTest$TestableSharePointDataSourceFactory.class
 com/aws/glue/connector/sharepoint/SharePointDataSourceReaderTest.class
+com/aws/glue/connector/sharepoint/client/SharePointClientFilePathTest.class
 com/aws/glue/connector/sharepoint/parser/FileParserFactoryTest.class
 com/aws/glue/connector/sharepoint/parser/CsvFileParserTest.class
 com/aws/glue/connector/sharepoint/SharePointDataSourceFactoryTest.class

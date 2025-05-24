@@ -123,4 +123,107 @@ class SharePointDataSourceReaderTest {
         // When & Then
         assertEquals("SharePoint", reader.name());
     }
+    
+    @Test
+    void getFiles_WithFilePathOption_ShouldUseSpecificFile() {
+        // Given
+        validOptions.put("sharepoint.filePath", "data/specific-file.csv");
+        CaseInsensitiveStringMap options = new CaseInsensitiveStringMap(validOptions);
+        SharePointDataSourceReader reader = new SharePointDataSourceReader(options, mockSharePointClient);
+        
+        SharePointFile specificFile = new SharePointFile("file-123", "specific-file.csv", 1024L, OffsetDateTime.now());
+        when(mockSharePointClient.getFileByPathAsList("data/specific-file.csv"))
+            .thenReturn(Arrays.asList(specificFile));
+        
+        // When
+        List<SharePointFile> files = reader.getFiles();
+        
+        // Then
+        assertNotNull(files);
+        assertEquals(1, files.size());
+        assertEquals("specific-file.csv", files.get(0).getName());
+        assertEquals("file-123", files.get(0).getId());
+        
+        verify(mockSharePointClient).getFileByPathAsList("data/specific-file.csv");
+        verify(mockSharePointClient, never()).listFiles();
+    }
+    
+    @Test
+    void getFiles_WithoutFilePathOption_ShouldUseAutomaticDiscovery() {
+        // Given
+        CaseInsensitiveStringMap options = new CaseInsensitiveStringMap(validOptions);
+        SharePointDataSourceReader reader = new SharePointDataSourceReader(options, mockSharePointClient);
+        
+        SharePointFile file1 = new SharePointFile("file-1", "file1.csv", 1024L, OffsetDateTime.now());
+        SharePointFile file2 = new SharePointFile("file-2", "file2.xlsx", 2048L, OffsetDateTime.now());
+        when(mockSharePointClient.listFiles()).thenReturn(Arrays.asList(file1, file2));
+        
+        // When
+        List<SharePointFile> files = reader.getFiles();
+        
+        // Then
+        assertNotNull(files);
+        assertEquals(2, files.size());
+        assertEquals("file1.csv", files.get(0).getName());
+        assertEquals("file2.xlsx", files.get(1).getName());
+        
+        verify(mockSharePointClient).listFiles();
+        verify(mockSharePointClient, never()).getFileByPathAsList(anyString());
+    }
+    
+    @Test
+    void getFiles_WithEmptyFilePathOption_ShouldUseAutomaticDiscovery() {
+        // Given
+        validOptions.put("sharepoint.filePath", "");
+        CaseInsensitiveStringMap options = new CaseInsensitiveStringMap(validOptions);
+        SharePointDataSourceReader reader = new SharePointDataSourceReader(options, mockSharePointClient);
+        
+        SharePointFile file1 = new SharePointFile("file-1", "auto1.csv", 1024L, OffsetDateTime.now());
+        when(mockSharePointClient.listFiles()).thenReturn(Arrays.asList(file1));
+        
+        // When
+        List<SharePointFile> files = reader.getFiles();
+        
+        // Then
+        assertNotNull(files);
+        assertEquals(1, files.size());
+        assertEquals("auto1.csv", files.get(0).getName());
+        
+        verify(mockSharePointClient).listFiles();
+        verify(mockSharePointClient, never()).getFileByPathAsList(anyString());
+    }
+    
+    @Test
+    void getFiles_WithWhitespaceFilePathOption_ShouldUseAutomaticDiscovery() {
+        // Given
+        validOptions.put("sharepoint.filePath", "   ");
+        CaseInsensitiveStringMap options = new CaseInsensitiveStringMap(validOptions);
+        SharePointDataSourceReader reader = new SharePointDataSourceReader(options, mockSharePointClient);
+        
+        SharePointFile file1 = new SharePointFile("file-1", "auto2.csv", 1024L, OffsetDateTime.now());
+        when(mockSharePointClient.listFiles()).thenReturn(Arrays.asList(file1));
+        
+        // When
+        List<SharePointFile> files = reader.getFiles();
+        
+        // Then
+        assertNotNull(files);
+        assertEquals(1, files.size());
+        assertEquals("auto2.csv", files.get(0).getName());
+        
+        verify(mockSharePointClient).listFiles();
+        verify(mockSharePointClient, never()).getFileByPathAsList(anyString());
+    }
+    
+    @Test
+    void validateOptions_WithFilePathOption_ShouldLogFilePath() {
+        // Given
+        validOptions.put("sharepoint.filePath", "reports/monthly-report.xlsx");
+        CaseInsensitiveStringMap options = new CaseInsensitiveStringMap(validOptions);
+        
+        // When & Then - should not throw exception
+        assertDoesNotThrow(() -> {
+            new SharePointDataSourceReader(options, mockSharePointClient);
+        });
+    }
 }

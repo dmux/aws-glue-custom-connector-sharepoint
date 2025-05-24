@@ -27,6 +27,7 @@ AWS Glue Job
 ### Azure AD Application Setup
 
 1. **Registrar Application no Azure AD:**
+
    - Acesse [Azure Portal](https://portal.azure.com)
    - Navegue para "Azure Active Directory" > "App registrations"
    - Clique em "New registration"
@@ -36,6 +37,7 @@ AWS Glue Job
      - Redirect URI: (deixe vazio para Client Credentials flow)
 
 2. **Configurar Permissões:**
+
    ```
    Microsoft Graph API Permissions:
    - Sites.Read.All (Application)
@@ -43,6 +45,7 @@ AWS Glue Job
    ```
 
 3. **Criar Client Secret:**
+
    - Vá para "Certificates & secrets"
    - Clique em "New client secret"
    - Configure a expiração desejada
@@ -56,11 +59,13 @@ AWS Glue Job
 ### Obter SharePoint Site ID
 
 **Opção 1: Microsoft Graph Explorer**
+
 ```
 GET https://graph.microsoft.com/v1.0/sites/{hostname}:/sites/{sitename}
 ```
 
 **Opção 2: PowerShell**
+
 ```powershell
 Connect-PnPOnline -Url "https://yourtenant.sharepoint.com/sites/yoursite" -Interactive
 Get-PnPSite | Select Id
@@ -122,24 +127,83 @@ aws glue create-connection --connection-input '{
 
 No AWS Glue Studio, ao criar uma Connection:
 
-| Propriedade | Valor | Obrigatório |
-|-------------|-------|-------------|
-| `sharepoint.clientId` | ID da aplicação Azure AD | ✅ |
-| `sharepoint.clientSecret` | Secret da aplicação Azure AD | ✅ |
-| `sharepoint.tenantId` | ID do tenant Azure AD | ✅ |
-| `sharepoint.siteId` | ID do site SharePoint | ✅ |
+| Propriedade               | Valor                        | Obrigatório |
+| ------------------------- | ---------------------------- | ----------- |
+| `sharepoint.clientId`     | ID da aplicação Azure AD     | ✅          |
+| `sharepoint.clientSecret` | Secret da aplicação Azure AD | ✅          |
+| `sharepoint.tenantId`     | ID do tenant Azure AD        | ✅          |
+| `sharepoint.siteId`       | ID do site SharePoint        | ✅          |
 
 > ⚠️ **Importante:** Marque `sharepoint.clientSecret` como "hidden" para segurança.
+
+## 📂 Modos de Operação
+
+O connector suporta dois modos de operação para localizar arquivos no SharePoint:
+
+### 1. **Discovery Automático** (Padrão)
+
+Quando não especificado o parâmetro `sharepoint.filePath`, o connector automaticamente:
+
+- Lista todos os arquivos na raiz da biblioteca de documentos
+- Filtra apenas arquivos suportados (`.csv`, `.xls`, `.xlsx`)
+- Processa todos os arquivos encontrados
+
+```python
+# Modo automático - processa todos os arquivos CSV/Excel encontrados
+sharepoint_options = {
+    "sharepoint.clientId": "your-client-id",
+    "sharepoint.clientSecret": "your-client-secret",
+    "sharepoint.tenantId": "your-tenant-id",
+    "sharepoint.siteId": "your-site-id"
+}
+```
+
+### 2. **Arquivo Específico**
+
+Quando especificado o parâmetro `sharepoint.filePath`, o connector:
+
+- Acessa diretamente o arquivo no caminho especificado
+- Suporta caminhos com subpastas
+- Valida se o tipo de arquivo é suportado
+
+```python
+# Modo específico - processa apenas o arquivo indicado
+sharepoint_options = {
+    "sharepoint.clientId": "your-client-id",
+    "sharepoint.clientSecret": "your-client-secret",
+    "sharepoint.tenantId": "your-tenant-id",
+    "sharepoint.siteId": "your-site-id",
+    "sharepoint.filePath": "Reports/Monthly/sales-data.xlsx"  # Caminho específico
+}
+```
+
+### Exemplos de Caminhos
+
+| Caminho                      | Descrição                                                 |
+| ---------------------------- | --------------------------------------------------------- |
+| `data.csv`                   | Arquivo na raiz da biblioteca                             |
+| `folder/data.csv`            | Arquivo em uma subpasta                                   |
+| `Reports/2024/Q1/sales.xlsx` | Arquivo em estrutura hierárquica                          |
+| `/Documents/report.csv`      | Caminho absoluto (barra inicial removida automaticamente) |
+
+### Validações
+
+- ✅ Arquivo deve existir no caminho especificado
+- ✅ Extensão deve ser suportada (`.csv`, `.xls`, `.xlsx`)
+- ✅ Usuário deve ter permissão de leitura no arquivo
+- ❌ Não suporta wildcards ou padrões de arquivo
 
 ## 💻 Uso
 
 ### Em AWS Glue Studio
 
 1. **Criar um novo Job:**
+
    - Escolha "Visual with a source and target"
    - Selecione "Custom connector" como source
 
 2. **Configurar Source:**
+
    - Selecione o "SharePoint Connector"
    - Configure a Connection com as credenciais
    - Configure as propriedades de conexão
@@ -164,6 +228,8 @@ sharepoint_options = {
     "sharepoint.clientSecret": "your-client-secret",
     "sharepoint.tenantId": "your-tenant-id",
     "sharepoint.siteId": "your-site-id"
+    # Opcional: especificar arquivo específico
+    # "sharepoint.filePath": "folder/subfolder/specific-file.csv"
 }
 
 # Inicializar contextos
@@ -279,10 +345,12 @@ Log Stream: {execution-id}
 ### Rotação de Credentials
 
 1. **No Azure AD:**
+
    - Gere um novo client secret
    - Mantenha o antigo ativo durante a transição
 
 2. **No AWS Glue:**
+
    - Atualize a connection com o novo secret
    - Teste a conectividade
 
@@ -302,24 +370,28 @@ Log Stream: {execution-id}
 ### Erros Comuns
 
 **1. Authentication Failed**
+
 ```
 Cause: Credenciais inválidas ou expiradas
 Solution: Verificar client ID, secret e tenant ID
 ```
 
 **2. Site Not Found**
+
 ```
 Cause: Site ID incorreto ou sem permissão
 Solution: Verificar site ID e permissões da aplicação
 ```
 
 **3. File Parse Error**
+
 ```
 Cause: Arquivo corrompido ou formato não suportado
 Solution: Verificar integridade do arquivo
 ```
 
 **4. OutOfMemory Error**
+
 ```
 Cause: Arquivo muito grande para memória disponível
 Solution: Aumentar recursos do Glue job ou implementar streaming
@@ -354,6 +426,7 @@ Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICEN
 ## 📞 Suporte
 
 Para suporte e dúvidas:
+
 - Abra uma [Issue](../../issues)
 - Consulte a [documentação oficial do AWS Glue](https://docs.aws.amazon.com/glue/)
 - Consulte a [documentação do Microsoft Graph](https://docs.microsoft.com/en-us/graph/)

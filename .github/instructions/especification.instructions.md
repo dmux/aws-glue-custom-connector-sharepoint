@@ -1,5 +1,5 @@
 ---
-applyTo: '**'
+applyTo: "**"
 ---
 
 # Especificação Técnica do AWS Glue Custom Connector para SharePoint
@@ -60,7 +60,9 @@ Implementação em Java de um AWS Glue Custom Connector que permite ao AWS Glue 
 
 ### 7.1. Parâmetros do Custom Connector
 
-Ao registrar o connector no AWS Glue, defina as seguintes propriedades obrigatórias em **Connection properties**:
+Ao registrar o connector no AWS Glue, defina as seguintes propriedades em **Connection properties**:
+
+#### Parâmetros Obrigatórios
 
 | Propriedade                 | Descrição                           |
 | --------------------------- | ----------------------------------- |
@@ -69,14 +71,46 @@ Ao registrar o connector no AWS Glue, defina as seguintes propriedades obrigató
 | \`sharepoint.tenantId\`     | ID do tenant Azure AD               |
 | \`sharepoint.siteId\`       | ID do site SharePoint               |
 
+#### Parâmetros Opcionais
+
+| Propriedade             | Descrição                                                              | Padrão                                    |
+| ----------------------- | ---------------------------------------------------------------------- | ----------------------------------------- |
+| \`sharepoint.filePath\` | Caminho específico do arquivo a ser processado (ex: "folder/file.csv") | Discovery automático de todos os arquivos |
+
+#### Modos de Operação
+
+**1. Discovery Automático (Padrão):**
+
+- Quando \`sharepoint.filePath\` não é especificado
+- Lista e processa todos os arquivos CSV/Excel na raiz da biblioteca
+- Ideal para processar múltiplos arquivos
+
+**2. Arquivo Específico:**
+
+- Quando \`sharepoint.filePath\` é especificado
+- Processa apenas o arquivo no caminho indicado
+- Suporta subpastas (ex: "Reports/2024/data.xlsx")
+- Ideal para processar um arquivo específico
+
 Em Java, dentro de \`DataSourceFactory.getDataSource(options)\`, leia:
 \`\`\`java
 String clientId = options.get("sharepoint.clientId");
 String clientSecret = options.get("sharepoint.clientSecret");
 String tenantId = options.get("sharepoint.tenantId");
 String siteId = options.get("sharepoint.siteId");
+String filePath = options.get("sharepoint.filePath"); // Opcional
+
 if (clientId==null || clientSecret==null || tenantId==null || siteId==null) {
 throw new IllegalArgumentException("Parâmetros de autenticação do SharePoint não configurados.");
+}
+
+// Determinar modo de operação
+if (filePath != null && !filePath.trim().isEmpty()) {
+// Modo arquivo específico
+logger.info("Usando arquivo específico: {}", filePath);
+} else {
+// Modo discovery automático
+logger.info("Usando discovery automático de arquivos");
 }
 \`\`\`
 
@@ -218,4 +252,3 @@ for (Cell cell : row) {
 - Rotação manual de \`clientSecret\` atualizando parâmetros no Glue Studio.
 
 ---
-

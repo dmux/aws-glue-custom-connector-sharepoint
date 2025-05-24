@@ -76,6 +76,12 @@ public class SharePointDataSourceReader implements Table, SupportsRead {
             );
         }
         
+        // Optional: validate file path if provided
+        String filePath = options.get("sharepoint.filePath");
+        if (filePath != null && !isNullOrEmpty(filePath)) {
+            logger.info("Specific file path configured: {}", filePath);
+        }
+        
         logger.debug("SharePoint connection parameters validated");
     }
     
@@ -125,7 +131,17 @@ public class SharePointDataSourceReader implements Table, SupportsRead {
     }
     
     public List<SharePointFile> getFiles() {
-        return sharePointClient.listFiles();
+        String filePath = options.get("sharepoint.filePath");
+        
+        if (filePath != null && !isNullOrEmpty(filePath)) {
+            // Use specific file path
+            logger.info("Using specific file path: {}", filePath);
+            return sharePointClient.getFileByPathAsList(filePath);
+        } else {
+            // Use automatic discovery (existing behavior)
+            logger.info("Using automatic file discovery");
+            return sharePointClient.listFiles();
+        }
     }
     
     public SharePointClient getSharePointClient() {

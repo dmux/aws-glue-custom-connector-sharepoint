@@ -1,4 +1,5 @@
 /Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/test/java/com/aws/glue/connector/sharepoint/SharePointDataSourceFactoryTest.java
+/Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/test/java/com/aws/glue/connector/sharepoint/client/SharePointClientFilePathTest.java
 /Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/test/java/com/aws/glue/connector/sharepoint/integration/SharePointConnectorIntegrationTest.java
 /Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/test/java/com/aws/glue/connector/sharepoint/parser/CsvFileParserTest.java
 /Users/guru/work/dmux/aws-glue-custom-connector-sharepoint/src/test/java/com/aws/glue/connector/sharepoint/auth/SharePointAuthenticatorTest.java
